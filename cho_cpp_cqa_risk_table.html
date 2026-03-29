@@ -1,0 +1,175 @@
+
+<style>
+  .risk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .risk-table th { font-weight: 500; font-size: 12px; text-align: left; padding: 8px 10px; background: var(--color-background-secondary); color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border-primary); letter-spacing: 0.03em; text-transform: uppercase; }
+  .risk-table td { padding: 9px 10px; border-bottom: 1px solid var(--color-border-tertiary); vertical-align: top; color: var(--color-text-primary); line-height: 1.5; }
+  .risk-table tr:last-child td { border-bottom: none; }
+  .risk-table tr:hover td { background: var(--color-background-secondary); }
+  .cpp-label { font-weight: 500; color: var(--color-text-primary); }
+  .cqa-pill { display: inline-block; margin: 2px 3px 2px 0; padding: 2px 7px; border-radius: 99px; font-size: 11px; font-weight: 500; line-height: 1.6; }
+  .cqa-glyco  { background: #EEEDFE; color: #3C3489; }
+  .cqa-charge { background: #E1F5EE; color: #085041; }
+  .cqa-aggr   { background: #FAECE7; color: #4A1B0C; }
+  .cqa-purity { background: #FBEAF0; color: #4B1528; }
+  .cqa-potency { background: #EAF3DE; color: #173404; }
+  .cqa-host   { background: #FAEEDA; color: #412402; }
+  .dark .cqa-glyco  { background: #3C3489; color: #CECBF6; }
+  .dark .cqa-charge { background: #085041; color: #9FE1CB; }
+  .dark .cqa-aggr   { background: #4A1B0C; color: #F5C4B3; }
+  .dark .cqa-purity { background: #4B1528; color: #F4C0D1; }
+  .dark .cqa-potency { background: #173404; color: #C0DD97; }
+  .dark .cqa-host   { background: #412402; color: #FAC775; }
+  .num { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); min-width: 18px; display: inline-block; }
+  .section-header { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); padding: 14px 10px 4px; letter-spacing: 0.04em; text-transform: uppercase; border-bottom: 1px solid var(--color-border-tertiary); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 0 4px; }
+  .top-bar { display: flex; align-items: baseline; gap: 8px; padding: 12px 0 10px; border-bottom: 1px solid var(--color-border-secondary); margin-bottom: 4px; }
+  .top-bar h2 { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+  .top-bar span { font-size: 12px; color: var(--color-text-secondary); }
+  @media (prefers-color-scheme: dark) {
+    .cqa-glyco  { background: #3C3489; color: #CECBF6; }
+    .cqa-charge { background: #085041; color: #9FE1CB; }
+    .cqa-aggr   { background: #4A1B0C; color: #F5C4B3; }
+    .cqa-purity { background: #4B1528; color: #F4C0D1; }
+    .cqa-potency { background: #173404; color: #C0DD97; }
+    .cqa-host   { background: #412402; color: #FAC775; }
+  }
+</style>
+
+<div style="padding: 0 2px;">
+  <div class="top-bar">
+    <h2>Fed-batch CHO bioreactor — CPP to CQA risk map</h2>
+    <span>ICH Q8 framework · MSAT perspective</span>
+  </div>
+  <div class="legend">
+    <span class="cqa-pill cqa-glyco">Glycosylation</span>
+    <span class="cqa-pill cqa-charge">Charge variants</span>
+    <span class="cqa-pill cqa-aggr">Aggregation / fragments</span>
+    <span class="cqa-pill cqa-purity">Purity / process-related impurities</span>
+    <span class="cqa-pill cqa-potency">Potency / biological activity</span>
+    <span class="cqa-pill cqa-host">Host-cell protein / DNA</span>
+  </div>
+
+  <table class="risk-table" style="margin-top:8px;">
+    <thead>
+      <tr>
+        <th style="width:22px;">#</th>
+        <th style="width:160px;">CPP</th>
+        <th style="width:200px;">Linked CQAs</th>
+        <th>Mechanism of impact</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td><span class="num">1</span></td>
+        <td><span class="cpp-label">Dissolved oxygen (DO)</span></td>
+        <td>
+          <span class="cqa-pill cqa-glyco">Glycosylation</span>
+          <span class="cqa-pill cqa-potency">Potency</span>
+        </td>
+        <td>DO drives nucleotide sugar availability for N-glycan synthesis. Hypoxia (&lt;20% sat.) depletes UDP-galactose and UDP-GlcNAc, reducing galactosylation and sialylation. Low DO also compromises cell energetics and productivity, affecting titre and product-related variants.</td>
+      </tr>
+
+      <tr>
+        <td><span class="num">2</span></td>
+        <td><span class="cpp-label">pH</span></td>
+        <td>
+          <span class="cqa-pill cqa-glyco">Glycosylation</span>
+          <span class="cqa-pill cqa-charge">Charge variants</span>
+          <span class="cqa-pill cqa-aggr">Aggregation / fragments</span>
+        </td>
+        <td>pH affects intracellular Golgi pH, which is critical for glycosyltransferase activity — shifts outside 6.8–7.2 alter galactosylation and sialylation profiles. Acidic excursions drive aspartate isomerisation and deamidation (Asn→Asp/isoAsp), altering the charge variant profile. Alkaline conditions promote disulfide scrambling and aggregation.</td>
+      </tr>
+
+      <tr>
+        <td><span class="num">3</span></td>
+        <td><span class="cpp-label">Temperature</span></td>
+        <td>
+          <span class="cqa-pill cqa-glyco">Glycosylation</span>
+          <span class="cqa-pill cqa-charge">Charge variants</span>
+          <span class="cqa-pill cqa-aggr">Aggregation / fragments</span>
+          <span class="cqa-pill cqa-potency">Potency</span>
+        </td>
+        <td>Temperature shifts (e.g. 37→33°C) modulate cell-specific productivity and glycan processing kinetics. Lower temperatures slow sialylation enzyme turnover, yielding lower sialic acid content but often higher galactosylation. Elevated temperatures increase proteolytic activity (fragmenting the mAb) and non-enzymatic modifications (deamidation). Temperature-shift timing is a key process lever in fed-batch design.</td>
+      </tr>
+
+      <tr>
+        <td><span class="num">4</span></td>
+        <td><span class="cpp-label">Agitation rate / shear</span></td>
+        <td>
+          <span class="cqa-pill cqa-aggr">Aggregation / fragments</span>
+          <span class="cqa-pill cqa-purity">Purity / process-related impurities</span>
+        </td>
+        <td>Excessive impeller speed or sparger bubble burst energy causes hydrodynamic shear stress, lysing cells and releasing host-cell proteins, DNA, and proteases. Sublethal shear alters cell membrane integrity without lysis, increasing HCP secretion. Localised cavitation near spargers is a key shear hotspot in large-scale vessels. Also promotes mAb aggregate formation at gas–liquid interfaces.</td>
+      </tr>
+
+      <tr>
+        <td><span class="num">5</span></td>
+        <td><span class="cpp-label">Osmolality</span></td>
+        <td>
+          <span class="cqa-pill cqa-glyco">Glycosylation</span>
+          <span class="cqa-pill cqa-charge">Charge variants</span>
+          <span class="cqa-pill cqa-purity">Purity / process-related impurities</span>
+        </td>
+        <td>Hyperosmolar conditions (&gt;450 mOsm/kg) — common with concentrated feed addition or excess NaHCO₃ correction — decrease cell growth and alter nucleotide sugar metabolism, shifting glycoforms. Osmotic stress induces unfolded protein response, increasing misfolded species and clipped variants. Elevated NaCl specifically impacts sialylation through CMP-sialic acid transporter competition.</td>
+      </tr>
+
+      <tr>
+        <td><span class="num">6</span></td>
+        <td><span class="cpp-label">Glucose / lactate levels</span></td>
+        <td>
+          <span class="cqa-pill cqa-glyco">Glycosylation</span>
+          <span class="cqa-pill cqa-potency">Potency</span>
+          <span class="cqa-pill cqa-purity">Purity / process-related impurities</span>
+        </td>
+        <td>Glucose is the primary carbon source for nucleotide sugar (UDP-GlcNAc, GDP-mannose) biosynthesis feeding the hexosamine pathway. Glucose limitation reduces Man5 occupancy and truncates glycan processing. Lactate accumulation (acidosis) further suppresses glycosylation enzyme activity and raises osmolality via counterion correction. Lactate shifts above ~15 mM are critical risk points in late fed-batch.</td>
+      </tr>
+
+      <tr>
+        <td><span class="num">7</span></td>
+        <td><span class="cpp-label">Feed rate / feeding strategy</span></td>
+        <td>
+          <span class="cqa-pill cqa-glyco">Glycosylation</span>
+          <span class="cqa-pill cqa-charge">Charge variants</span>
+          <span class="cqa-pill cqa-host">HCP / DNA</span>
+        </td>
+        <td>Feed composition and timing directly controls intracellular amino acid and nucleotide sugar pools. Glutamine limitation promotes asparagine deamidation (charge variant impact). Manganese supplementation in feed strongly drives galactosylation and sialylation via β-1,4-galactosyltransferase activation. Overfeeding drives lactate accumulation; underfeeding limits cell viability and increases apoptotic debris (HCP, DNA).</td>
+      </tr>
+
+      <tr>
+        <td><span class="num">8</span></td>
+        <td><span class="cpp-label">pCO₂</span></td>
+        <td>
+          <span class="cqa-pill cqa-glyco">Glycosylation</span>
+          <span class="cqa-pill cqa-charge">Charge variants</span>
+          <span class="cqa-pill cqa-aggr">Aggregation / fragments</span>
+        </td>
+        <td>Elevated pCO₂ (&gt;150 mmHg) acidifies intracellular pH independent of bulk pH control, suppressing Golgi glycosyltransferase activity and reducing sialylation. High CO₂ also promotes lysine carbamylation, creating acidic charge variants. In large-scale vessels, CO₂ stripping is mass-transfer limited, making pCO₂ a critical scale-up parameter. Chronic high pCO₂ impairs cell growth and induces stress responses.</td>
+      </tr>
+
+      <tr>
+        <td><span class="num">9</span></td>
+        <td><span class="cpp-label">Cell density / seeding density</span></td>
+        <td>
+          <span class="cqa-pill cqa-glyco">Glycosylation</span>
+          <span class="cqa-pill cqa-host">HCP / DNA</span>
+          <span class="cqa-pill cqa-purity">Purity / process-related impurities</span>
+        </td>
+        <td>Seeding density affects the growth phase trajectory and time-in-culture, which controls the residence time of product in the bioreactor under potential enzymatic degradation. High peak VCD generates more metabolic waste and increases culture heterogeneity. Late-culture viability decline drives HCP and DNA release from lysed cells. Consistent N-1 seeding density is a critical upstream control to ensure reproducible glycosylation and impurity profiles.</td>
+      </tr>
+
+      <tr>
+        <td><span class="num">10</span></td>
+        <td><span class="cpp-label">Culture duration / harvest timing</span></td>
+        <td>
+          <span class="cqa-pill cqa-charge">Charge variants</span>
+          <span class="cqa-pill cqa-aggr">Aggregation / fragments</span>
+          <span class="cqa-pill cqa-host">HCP / DNA</span>
+          <span class="cqa-pill cqa-purity">Purity / process-related impurities</span>
+        </td>
+        <td>Extended culture duration increases product exposure to secreted proteases (fragments), reduces viability below thresholds (typically &lt;60%), and elevates HCP/DNA burden from cell lysis. Time-dependent non-enzymatic modifications (deamidation, isomerisation, oxidation) accumulate as acidic and oxidised charge variants. Harvest timing is typically controlled by a combination of time, VCD, and viability criteria to balance titre vs. quality.</td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>

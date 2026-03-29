@@ -1,0 +1,304 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.header-bar{display:flex;align-items:baseline;justify-content:space-between;padding:12px 0 10px;border-bottom:1px solid var(--color-border-secondary);margin-bottom:8px;flex-wrap:wrap;gap:8px;}
+.header-bar h2{font-size:15px;font-weight:500;color:var(--color-text-primary);}
+.header-bar span{font-size:12px;color:var(--color-text-secondary);}
+.controls{display:flex;gap:8px;padding:8px 0 12px;flex-wrap:wrap;align-items:center;}
+.controls label{font-size:12px;color:var(--color-text-secondary);}
+.controls select{font-size:12px;padding:4px 8px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;}
+.badge-hp{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500;background:#FCEBEB;color:#791F1F;}
+.badge-std{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500;background:#F1EFE8;color:#444441;}
+@media(prefers-color-scheme:dark){
+  .badge-hp{background:#501313;color:#F7C1C1;}
+  .badge-std{background:#444441;color:#D3D1C7;}
+}
+.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.stat-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;}
+.stat-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em;}
+.stat-val{font-size:20px;font-weight:500;color:var(--color-text-primary);}
+.stat-val.danger{color:var(--color-text-danger);}
+.stat-val.warn{color:var(--color-text-warning);}
+.tbl{width:100%;border-collapse:collapse;table-layout:fixed;}
+.tbl th{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-align:left;padding:7px 8px;background:var(--color-background-secondary);border-bottom:1px solid var(--color-border-primary);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;}
+.tbl td{padding:9px 8px;border-bottom:1px solid var(--color-border-tertiary);vertical-align:top;font-size:12px;color:var(--color-text-primary);line-height:1.45;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:var(--color-background-secondary);}
+.cpp-name{font-weight:500;font-size:12px;}
+.score-cell{text-align:center;font-weight:500;vertical-align:top;}
+.score-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.score-num{font-weight:500;font-size:12px;}
+.score-note{font-size:10px;color:var(--color-text-secondary);line-height:1.35;text-align:center;max-width:80px;}
+.score-changed{color:var(--color-text-info);font-weight:500;}
+.score-badge-changed{display:inline-block;background:var(--color-background-info);color:var(--color-text-info);font-size:9px;padding:1px 4px;border-radius:4px;font-weight:500;margin-bottom:1px;}
+.rpn-cell{text-align:center;font-size:13px;font-weight:500;vertical-align:top;}
+.rpn-changed{font-size:9px;color:var(--color-text-secondary);display:block;text-decoration:line-through;margin-bottom:1px;}
+.rpn-high{color:var(--color-text-danger);}
+.rpn-med{color:var(--color-text-warning);}
+.rpn-low{color:var(--color-text-success);}
+.root-badge{display:inline-flex;align-items:center;font-size:11px;padding:2px 7px;border-radius:99px;font-weight:500;white-space:nowrap;}
+.rb-eq{background:#E6F1FB;color:#0C447C;}
+.rb-rm{background:#E1F5EE;color:#085041;}
+.rb-pd{background:#FAEEDA;color:#633806;}
+.rb-op{background:#FBEAF0;color:#72243E;}
+@media(prefers-color-scheme:dark){
+  .rb-eq{background:#0C447C;color:#B5D4F4;}
+  .rb-rm{background:#085041;color:#9FE1CB;}
+  .rb-pd{background:#633806;color:#FAC775;}
+  .rb-op{background:#72243E;color:#F4C0D1;}
+}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px;vertical-align:middle;}
+.dot-eq{background:#378ADD;}
+.dot-rm{background:#1D9E75;}
+.dot-pd{background:#EF9F27;}
+.dot-op{background:#D4537E;}
+.version-tag{font-size:11px;background:var(--color-background-info);color:var(--color-text-info);padding:2px 8px;border-radius:99px;font-weight:500;}
+</style>
+
+<div class="header-bar">
+  <h2>CHO fed-batch bioreactor — FMEA risk register <span class="version-tag" style="margin-left:8px;">v2 — expert-adjusted</span></h2>
+  <span>RPN = S × P × D &nbsp;·&nbsp; High priority: RPN &gt; 30 &nbsp;·&nbsp; Adjusted scores shown in blue</span>
+</div>
+
+<div class="summary-grid" id="summary-grid"></div>
+
+<div class="controls">
+  <label>Filter by priority:</label>
+  <select id="filter-priority" onchange="applyFilters()">
+    <option value="all">All</option>
+    <option value="high">High priority (RPN &gt; 30)</option>
+    <option value="med">Medium (RPN 15–30)</option>
+    <option value="low">Low (RPN &lt; 15)</option>
+  </select>
+  <label style="margin-left:8px;">Root cause:</label>
+  <select id="filter-root" onchange="applyFilters()">
+    <option value="all">All</option>
+    <option value="Equipment">Equipment</option>
+    <option value="Raw material">Raw material</option>
+    <option value="Process drift">Process drift</option>
+    <option value="Operator">Operator</option>
+  </select>
+  <label style="margin-left:8px;">Sort by:</label>
+  <select id="sort-by" onchange="applyFilters()">
+    <option value="rpn-desc">RPN (high → low)</option>
+    <option value="rpn-asc">RPN (low → high)</option>
+    <option value="sev-desc">Severity (high → low)</option>
+  </select>
+</div>
+
+<div style="overflow-x:auto;">
+<table class="tbl" id="fmea-table">
+<thead>
+<tr>
+  <th style="width:96px;">CPP</th>
+  <th style="width:130px;">Failure mode</th>
+  <th style="width:140px;">Effect on CQA</th>
+  <th style="width:82px;">Root cause</th>
+  <th style="width:52px;">S</th>
+  <th style="width:52px;">P</th>
+  <th style="width:52px;">D</th>
+  <th style="width:44px;">RPN</th>
+  <th style="width:72px;">Priority</th>
+</tr>
+</thead>
+<tbody id="fmea-body"></tbody>
+</table>
+</div>
+
+<div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--color-border-tertiary);display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--color-text-secondary);">
+  <span><strong>S</strong> Severity 1–5 &nbsp;<strong>P</strong> Probability 1–5 &nbsp;<strong>D</strong> Detectability 1–5 (5 = not detectable in-process)</span>
+  <span>
+    <span class="dot dot-eq"></span>Equipment &nbsp;
+    <span class="dot dot-rm"></span>Raw material &nbsp;
+    <span class="dot dot-pd"></span>Process drift &nbsp;
+    <span class="dot dot-op"></span>Operator
+  </span>
+  <span style="color:var(--color-text-info);">&#9679; Blue = expert-adjusted score with rationale</span>
+</div>
+
+<script>
+const data = [
+  {
+    cpp:"pH",
+    failure:"pH excursion outside 6.8–7.2 set-point; base/acid control failure",
+    effect:"Deamidation → acidic charge variants; suppressed glycosyltransferase → low galactosylation; alkaline spike → aggregation",
+    root:"Equipment",
+    S:5, Sold:null,
+    P:3, Pold:null,
+    D:1, Dold:2,
+    Dnote:"Bulk pH is detectable in-process by QC; however, mechanistic drivers of glycosylation impact (intracellular and Golgi pH) are not directly measurable in-process — true effect detectability remains limited."
+  },
+  {
+    cpp:"pCO₂",
+    failure:"CO₂ accumulation >150 mmHg; inadequate stripping at scale",
+    effect:"Intracellular acidification suppresses sialylation; carbamylation of lysine creates acidic charge variants; inhibits cell growth",
+    root:"Process drift",
+    S:4, Sold:null,
+    P:4, Pold:null,
+    D:2, Dold:3,
+    Dnote:"In-process sensors (e.g. optical CO₂ probes) allow real-time monitoring; reduces but does not eliminate detection lag at scale."
+  },
+  {
+    cpp:"Dissolved oxygen",
+    failure:"DO drops below 20% saturation; sparger blockage or cascade control failure",
+    effect:"Depleted nucleotide sugar pools reduce galactosylation/sialylation; energetic deficit impairs productivity and titre",
+    root:"Equipment",
+    S:4, Sold:null,
+    P:2, Pold:null,
+    D:2, Dold:null,
+    Dnote:null
+  },
+  {
+    cpp:"Temperature",
+    failure:"Temperature shift mistimed or set-point deviation; chiller/heater malfunction",
+    effect:"Altered sialylation kinetics; increased proteolytic fragmentation at elevated temp; deamidation rate change affects charge variants",
+    root:"Equipment",
+    S:4, Sold:null,
+    P:2, Pold:null,
+    D:1, Dold:null,
+    Dnote:null
+  },
+  {
+    cpp:"Glucose / lactate",
+    failure:"Glucose depletion between feeds; lactate accumulation >15 mM",
+    effect:"Truncated N-glycan processing; osmolality rise from counterion correction impacts glycosylation; elevated HCP/DNA from viability decline",
+    root:"Process drift",
+    S:4, Sold:null,
+    P:3, Pold:null,
+    D:2, Dold:null,
+    Dnote:null
+  },
+  {
+    cpp:"Feed rate / strategy",
+    failure:"Feed bolus mis-timed, wrong volume, or wrong composition",
+    effect:"Amino acid limitation → deamidation (charge variants); Mn deficiency → low galactosylation; overfeeding drives lactate; underfeeding crashes viability (HCP, DNA)",
+    root:"Operator",
+    S:5, Sold:null,
+    P:3, Pold:null,
+    D:3, Dold:null,
+    Dnote:null
+  },
+  {
+    cpp:"Osmolality",
+    failure:"Hyperosmolality >450 mOsm/kg from concentrated feed or excess base",
+    effect:"NaCl-driven suppression of CMP-sialic acid transporter; UPR activation produces misfolded/clipped variants; reduced cell growth",
+    root:"Raw material",
+    S:3, Sold:null,
+    P:3, Pold:null,
+    D:1, Dold:2,
+    Dnote:"Osmolality is measured in-process by QC using a fast, reliable, instrument-based assay (freezing point depression). Note: S was considered for adjustment to 4 to reflect viability/titer impact; retained at 3 as reduced growth is a manufacturing yield concern rather than a direct CQA failure."
+  },
+  {
+    cpp:"Agitation / shear",
+    failure:"Excessive impeller speed or sparger rate; gas–liquid interface damage",
+    effect:"Cell lysis elevates HCP, DNA, and protease (fragments); mAb aggregate formation at interface; localised cavitation in large vessels",
+    root:"Equipment",
+    S:4, Sold:null,
+    P:3, Pold:2,
+    D:2, Dold:3,
+    Pnote:"At manufacturing scale, shear profiles from impeller geometry, sparger design, and vessel aspect ratio are difficult to fully characterise during development. Correlation to bench scale is rarely reliable as scale increases.",
+    Dnote:"Effects (HCP, fragmentation, DNA) are detectable in-process via ELISAs, SEC, and ddPCR by QC. These assays measure consequences of shear rather than the shear event itself; the root cause is not directly observable."
+  },
+  {
+    cpp:"Cell / seed density",
+    failure:"N-1 seed culture out of spec; cell bank vial defect",
+    effect:"Aberrant growth trajectory shifts glycosylation time-in-culture; high peak VCD increases metabolic waste; HCP/DNA from viability collapse",
+    root:"Raw material",
+    S:3, Sold:null,
+    P:2, Pold:null,
+    D:2, Dold:null,
+    Dnote:null
+  },
+  {
+    cpp:"Culture duration / harvest timing",
+    failure:"Late harvest; viability falls below 60% before harvest",
+    effect:"Protease accumulation increases fragmentation; deamidation/isomerisation accumulate as acidic variants; HCP/DNA burden elevates with cell lysis",
+    root:"Process drift",
+    S:4, Sold:null,
+    P:3, Pold:null,
+    D:2, Dold:null,
+    Dnote:null
+  }
+];
+
+data.forEach(d=>{
+  d.rpn=d.S*d.P*d.D;
+  d.rpnOld = (d.Sold||d.S)*(d.Pold||d.P)*(d.Dold||d.D);
+});
+
+function rootClass(r){
+  if(r==="Equipment") return "rb-eq";
+  if(r==="Raw material") return "rb-rm";
+  if(r==="Process drift") return "rb-pd";
+  if(r==="Operator") return "rb-op";
+  return "";
+}
+function rpnClass(rpn){
+  if(rpn>30) return "rpn-high";
+  if(rpn>=15) return "rpn-med";
+  return "rpn-low";
+}
+function priorityBadge(rpn){
+  return rpn>30?'<span class="badge-hp">High priority</span>':'<span class="badge-std">Standard</span>';
+}
+
+function scoreCell(val, oldVal, note){
+  const changed = oldVal !== null && oldVal !== undefined;
+  return `<div class="score-wrap">
+    ${changed?`<span class="score-badge-changed">was ${oldVal}</span>`:''}
+    <span class="score-num ${changed?'score-changed':''}">${val}</span>
+    ${note?`<span class="score-note">${note}</span>`:''}
+  </div>`;
+}
+
+function renderSummary(rows){
+  const hp=rows.filter(d=>d.rpn>30).length;
+  const maxRpn=Math.max(...rows.map(d=>d.rpn));
+  const avgRpn=Math.round(rows.reduce((a,d)=>a+d.rpn,0)/rows.length);
+  const maxCpp=rows.find(d=>d.rpn===maxRpn);
+  document.getElementById("summary-grid").innerHTML=`
+    <div class="stat-card"><div class="stat-label">CPPs assessed</div><div class="stat-val">${rows.length}</div></div>
+    <div class="stat-card"><div class="stat-label">High priority (RPN &gt;30)</div><div class="stat-val danger">${hp}</div></div>
+    <div class="stat-card"><div class="stat-label">Average RPN</div><div class="stat-val warn">${avgRpn}</div></div>
+    <div class="stat-card"><div class="stat-label">Highest RPN</div><div class="stat-val danger">${maxRpn}<span style="font-size:11px;font-weight:400;color:var(--color-text-secondary);display:block;">${maxCpp?maxCpp.cpp:""}</span></div></div>
+  `;
+}
+
+function applyFilters(){
+  const fp=document.getElementById("filter-priority").value;
+  const fr=document.getElementById("filter-root").value;
+  const sb=document.getElementById("sort-by").value;
+
+  let rows=[...data];
+  if(fp==="high") rows=rows.filter(d=>d.rpn>30);
+  else if(fp==="med") rows=rows.filter(d=>d.rpn>=15&&d.rpn<=30);
+  else if(fp==="low") rows=rows.filter(d=>d.rpn<15);
+  if(fr!=="all") rows=rows.filter(d=>d.root===fr);
+  if(sb==="rpn-desc") rows.sort((a,b)=>b.rpn-a.rpn);
+  else if(sb==="rpn-asc") rows.sort((a,b)=>a.rpn-b.rpn);
+  else if(sb==="sev-desc") rows.sort((a,b)=>b.S-a.S);
+
+  renderSummary(rows);
+
+  const rpnChanged = d => (d.Sold||d.Pold||d.Dold);
+
+  document.getElementById("fmea-body").innerHTML=rows.map(d=>`
+    <tr>
+      <td><span class="cpp-name">${d.cpp}</span></td>
+      <td>${d.failure}</td>
+      <td>${d.effect}</td>
+      <td><span class="root-badge ${rootClass(d.root)}">${d.root}</span></td>
+      <td class="score-cell">${scoreCell(d.S, d.Sold, d.Snote||null)}</td>
+      <td class="score-cell">${scoreCell(d.P, d.Pold, d.Pnote||null)}</td>
+      <td class="score-cell">${scoreCell(d.D, d.Dold, d.Dnote||null)}</td>
+      <td class="rpn-cell ${rpnClass(d.rpn)}">
+        ${rpnChanged(d)?`<span class="rpn-changed">${d.rpnOld}</span>`:''}
+        ${d.rpn}
+      </td>
+      <td>${priorityBadge(d.rpn)}</td>
+    </tr>
+  `).join("");
+}
+
+applyFilters();
+</script>
